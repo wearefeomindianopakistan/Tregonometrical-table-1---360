@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en"> 
+<head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>Trigonometric Table</title> 
+  <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: darkblue;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: red;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+            color: blue;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: green;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        button:hover {
+            background-color: darkgreen;
+        }
+        .nd-value {
+            color: red;
+            font-weight: bold;
+            font-size: 30px;
+        }
+    </style> 
+</head> 
+<body> 
+  <h1>Trigonometric Values from 1° to 360°</h1> 
+  <button onclick="togglePrecision()">Toggle Precision</button>
+  <table> 
+   <thead> 
+    <tr> 
+     <th>Angle (°)</th> 
+     <th>Sine (sin)</th> 
+     <th>Cosine (cos)</th> 
+     <th>Tangent (tan)</th> 
+     <th>Cotangent (cot)</th> 
+     <th>Secant (sec)</th> 
+     <th>Cosecant (csc)</th> 
+    </tr> 
+   </thead> 
+   <tbody> <!-- JavaScript will populate this section --> 
+   </tbody> 
+  </table> 
+  <script>
+    let highPrecision = true;
+
+    function createTrigTable() {
+        const tableBody = document.querySelector('tbody');
+        tableBody.innerHTML = ''; // Clear existing table rows
+
+        for (let angle = 1; angle <= 360; angle++) {
+            const rad = angle * Math.PI / 180;
+            const sinValue = Math.sin(rad);
+            const cosValue = Math.cos(rad);
+            
+            // Declare variables with let to allow reassignment
+            let tanValue = (cosValue === 0) ? 'undefined' : Math.tan(rad);
+            let cotValue = (sinValue === 0) ? 'undefined' : cosValue / sinValue;
+            let secValue = (cosValue === 0) ? 'undefined' : 1 / cosValue;
+            let cscValue = (sinValue === 0) ? 'undefined' : 1 / sinValue;
+
+            // Set n/d for values that exceed a threshold or are undefined
+            if (angle % 90 === 0 && angle % 180 !== 0) { // 90°, 270° for tan and sec
+                tanValue = 'n/d';
+                secValue = 'n/d';
+            }
+            if (angle % 180 === 0) { // 0°, 180° for cot and csc
+                cotValue = 'n/d';
+                cscValue = 'n/d';
+            }
+            if (sinValue === 0 || cosValue === 0) {
+                if (Math.abs(1 / sinValue) > 1e10 || Math.abs(1 / cosValue) > 1e10) {
+                    cscValue = 'n/d';
+                    secValue = 'n/d';
+                }
+            }
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${angle}</td>
+                <td>${formatValue(sinValue)}</td>
+                <td>${formatValue(cosValue)}</td>
+                <td>${formatValue(tanValue)}</td>
+                <td>${formatValue(cotValue)}</td>
+                <td>${formatValue(secValue)}</td>
+                <td>${formatValue(cscValue)}</td>
+            `;
+            tableBody.appendChild(row);
+        }
+    }
+
+    function formatValue(value) {
+        if (value === 'undefined') {
+            return value; // Keep 'undefined' as is
+        }
+        if (value === 'n/d') {
+            return `<span class="nd-value">${value}</span>`; // Return styled 'n/d'
+        }
+        return highPrecision ? value.toFixed(10) : value.toFixed(4);
+    }
+
+    function togglePrecision() {
+        highPrecision = !highPrecision;
+        createTrigTable();
+    }
+
+    createTrigTable();
+  </script> 
+</body>
+</html>
